@@ -69,12 +69,32 @@ router.post('/signin', async (req, res) => { // Use async/await
 });
 
 router.route('/movies')
-    .get(authJwtController.isAuthenticated, async (req, res) => {
-        return res.status(500).json({ success: false, message: 'GET request not supported' });
-    })
-    .post(authJwtController.isAuthenticated, async (req, res) => {
-        return res.status(500).json({ success: false, message: 'POST request not supported' });
-    });
+  .get(authJwtController.isAuthenticated, async (req, res) => {
+    try {
+      const movies = await Movie.find(); // Retrieve all movies
+      res.status(200).json({ success: true, movies });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error retrieving movies", error: error.message });
+    }
+  })
+  .post(authJwtController.isAuthenticated, async (req, res) => {
+    try {
+      const { title, releaseDate, genre, actors } = req.body;
+
+      if (!title || !releaseDate || !genre || !actors || actors.length !== 3) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Missing required fields or actors must have exactly 3 entries" });
+      }
+
+      const newMovie = new Movie({ title, releaseDate, genre, actors });
+      await newMovie.save();
+
+      res.status(201).json({ success: true, message: "Movie added successfully", newMovie });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error adding movie", error: error.message });
+    }
+  });
 
 app.use('/', router);
 
