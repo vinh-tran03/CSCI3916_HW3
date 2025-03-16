@@ -96,21 +96,25 @@ router.route('/movies')
     }
   });
 
-router.route('/movies/:id')
-  // PUT - Update an existing movie by ID
+  router.route('/movies/:title')
+  // PUT - Update an existing movie by title
   .put(authJwtController.isAuthenticated, async (req, res) => {
     try {
-      const { id } = req.params;
-      const { title, releaseDate, genre, actors } = req.body;
+      const { title } = req.params;
+      const { releaseDate, genre, actors } = req.body;
 
-      if (!title || !releaseDate || !genre || !actors) {
+      if (!releaseDate || !genre || !actors) {
         return res
           .status(400)
           .json({ success: false, message: "Missing required fields" });
       }
 
-      const updatedMovie = await Movie.findByIdAndUpdate(id, { title, releaseDate, genre, actors }, { new: true });
-      
+      const updatedMovie = await Movie.findOneAndUpdate(
+        { title: title },
+        { releaseDate, genre, actors },
+        { new: true }
+      );
+
       if (!updatedMovie) {
         return res.status(404).json({ success: false, message: "Movie not found" });
       }
@@ -121,12 +125,12 @@ router.route('/movies/:id')
     }
   })
   
-  // DELETE - Delete a movie by ID
+  // DELETE - Delete a movie by title
   .delete(authJwtController.isAuthenticated, async (req, res) => {
     try {
-      const { id } = req.params;
+      const { title } = req.params;
 
-      const deletedMovie = await Movie.findByIdAndDelete(id);
+      const deletedMovie = await Movie.findOneAndDelete({ title: title });
 
       if (!deletedMovie) {
         return res.status(404).json({ success: false, message: "Movie not found" });
@@ -136,7 +140,7 @@ router.route('/movies/:id')
     } catch (error) {
       res.status(500).json({ success: false, message: "Error deleting movie", error: error.message });
     }
-});
+  });
 
 app.use('/', router);
 
