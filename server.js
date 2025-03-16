@@ -96,6 +96,48 @@ router.route('/movies')
     }
   });
 
+router.route('/movies/:id')
+  // PUT - Update an existing movie by ID
+  .put(authJwtController.isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { title, releaseDate, genre, actors } = req.body;
+
+      if (!title || !releaseDate || !genre || !actors) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Missing required fields" });
+      }
+
+      const updatedMovie = await Movie.findByIdAndUpdate(id, { title, releaseDate, genre, actors }, { new: true });
+      
+      if (!updatedMovie) {
+        return res.status(404).json({ success: false, message: "Movie not found" });
+      }
+
+      res.status(200).json({ success: true, message: "Movie updated successfully", updatedMovie });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error updating movie", error: error.message });
+    }
+  })
+  
+  // DELETE - Delete a movie by ID
+  .delete(authJwtController.isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const deletedMovie = await Movie.findByIdAndDelete(id);
+
+      if (!deletedMovie) {
+        return res.status(404).json({ success: false, message: "Movie not found" });
+      }
+
+      res.status(200).json({ success: true, message: "Movie deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error deleting movie", error: error.message });
+    }
+});
+
 app.use('/', router);
 
 const PORT = process.env.PORT || 8080; // Define PORT before using it
