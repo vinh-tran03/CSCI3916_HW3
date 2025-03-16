@@ -97,6 +97,21 @@ router.route('/movies')
   });
 
   router.route('/movies/:title')
+  // GET - Retrieve a movie by title
+  .get(authJwtController.isAuthenticated, async (req, res) => {
+    try {
+      const { title } = req.params;
+      const movie = await Movie.findOne({ title: title }); // Find movie by title
+
+      if (!movie) {
+        return res.status(404).json({ success: false, message: "Movie not found" });
+      }
+
+      res.status(200).json({ success: true, movie });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error retrieving movie", error: error.message });
+    }
+  })
   // PUT - Update an existing movie by title
   .put(authJwtController.isAuthenticated, async (req, res) => {
     try {
