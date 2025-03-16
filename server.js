@@ -89,7 +89,6 @@ router.route('/movies')
 
       const newMovie = new Movie({ title, releaseDate, genre, actors });
       await newMovie.save();
-      const movies = await Movie.find();
 
       res.status(201).json({ success: true, message: "Movie added successfully", newMovie });
     } catch (error) {
