@@ -73,7 +73,6 @@ router.route('/movies')
     try {
       const movies = await Movie.find(); // Retrieve all movies
       res.status(200).json({ success: true, movies });
-      res.json(movies);
     } catch (error) {
       res.status(500).json({ success: false, message: "Error retrieving movies", error: error.message });
     }
