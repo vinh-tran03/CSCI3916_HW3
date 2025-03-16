@@ -81,10 +81,10 @@ router.route('/movies')
     try {
       const { title, releaseDate, genre, actors } = req.body;
 
-      if (!title || !releaseDate || !genre || !actors || actors.length !== 3) {
+      if (!title || !releaseDate || !genre || !actors ) {
         return res
           .status(400)
-          .json({ success: false, message: "Missing required fields or actors must have exactly 3 entries" });
+          .json({ success: false, message: "Missing required fields" });
       }
 
       const newMovie = new Movie({ title, releaseDate, genre, actors });
