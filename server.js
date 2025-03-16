@@ -72,8 +72,8 @@ router.route('/movies')
   .get(authJwtController.isAuthenticated, async (req, res) => {
     try {
       const movies = await Movie.find(); // Retrieve all movies
-      res.json(movies);
       res.status(200).json({ success: true, movies });
+      res.json(movies);
     } catch (error) {
       res.status(500).json({ success: false, message: "Error retrieving movies", error: error.message });
     }
