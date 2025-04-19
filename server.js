@@ -156,6 +156,39 @@ router.route('/movies')
       res.status(500).json({ success: false, message: "Error deleting movie", error: error.message });
     }
   });
+  
+  router.route('/movies/:movieID')
+  .patch(authJwtController.isAuthenticated, async (req, res) => {
+    try {
+      const { imageUrl } = req.body;
+
+      if (!imageUrl) {
+        return res.status(400).json({ success: false, message: "Missing imageUrl in request body" });
+      }
+
+      const updatedMovie = await Movie.findByIdAndUpdate(
+        req.params.movieID,
+        { imageUrl },
+        { new: true } // Return the updated document
+      );
+
+      if (!updatedMovie) {
+        return res.status(404).json({ success: false, message: "Movie not found" });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "imageUrl updated successfully",
+        updatedMovie,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error updating imageUrl",
+        error: error.message,
+      });
+    }
+  });
 
 app.use('/', router);
 
