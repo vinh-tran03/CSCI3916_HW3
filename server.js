@@ -79,7 +79,7 @@ router.route('/movies')
   })
   .post(authJwtController.isAuthenticated, async (req, res) => {
     try {
-      const { title, releaseDate, genre, actors } = req.body;
+      const { title, releaseDate, genre, actors, imageUrl } = req.body;
 
       if (!title || !releaseDate || !genre || !actors ) {
         return res
@@ -87,7 +87,7 @@ router.route('/movies')
           .json({ success: false, message: "Missing required fields" });
       }
 
-      const newMovie = new Movie({ title, releaseDate, genre, actors });
+      const newMovie = new Movie({ title, releaseDate, genre, actors, imageUrl });
       await newMovie.save();
 
       res.status(201).json({ success: true, message: "Movie added successfully", newMovie });
